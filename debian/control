@@ -10,8 +10,7 @@ Package: adaptation-samsung-s20fe
 Architecture: arm64
 Depends: ${misc:Depends},
          adaptation-hybris-api30-phone,
-         adaptation-samsung-s20fe-configs (= ${binary:Version}),
-
+         adaptation-samsung-s20fe-configs (= ${binary:Version})
 Description: Community adaptation for Samsung S20 FE - metapackage
 
 Package: adaptation-samsung-s20fe-configs
