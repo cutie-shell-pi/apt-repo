@@ -1,20 +1,20 @@
-Source: adaptation-motorola-sofia
-Maintainer: arpio <alex@familyrutz.com>
+Source: adaptation-samsung-s20fe
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
 Section: metapackages
 Priority: optional
-Build-Depends: debhelper (>= 10),
-               debhelper-compat (= 13),
-Standards-Version: 4.5.0.3
+Build-Depends: debhelper (>= 13),
+               debhelper-compat (= 13)
+Standards-Version: 4.6.2
 
-Package: adaptation-motorola-sofia
+Package: adaptation-samsung-s20fe
 Architecture: arm64
 Depends: ${misc:Depends},
-         adaptation-hybris-api29-phone | adaptation-hybris-api30-phone,
-         adaptation-motorola-sofia-configs (= ${binary:Version}),
-         linux-bootimage-motorola-sofia,
-Description: Community adaptation for motorola-sofia - metapackage
+         adaptation-hybris-api30-phone,
+         adaptation-samsung-s20fe-configs (= ${binary:Version}),
 
-Package: adaptation-motorola-sofia-configs
+Description: Community adaptation for Samsung S20 FE - metapackage
+
+Package: adaptation-samsung-s20fe-configs
 Architecture: arm64
-Depends: ${misc:Depends},
-Description: Community adaptation for motorola-sofia - adaptation configurations
+Depends: ${misc:Depends}
+Description: Community adaptation for Samsung S20 FE - adaptation configurations

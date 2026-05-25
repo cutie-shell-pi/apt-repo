@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable SEC touchscreen for  Samsung S20 FE
+After=phosh.service
+Requires=phosh.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 5 && echo 1 > /sys/class/sec/tsp/input/enabled'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical.target

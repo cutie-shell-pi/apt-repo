@@ -1,5 +1,5 @@
 [Unit]
-Description=Fixes for Moto G Power
+Description=Audio hardware fixes for Samsung S20 FE
 Before=phosh.service
 After=android-mount.service
 Depends=android-mount.service
@@ -10,7 +10,7 @@ RemainAfterExit=yes
 
 # use audio.hidl_compat wrapper HAL
 ExecStartPre=/bin/sleep 3
-ExecStart=mount -o bind /system/lib64/hw/audio.hidl_compat.default.so /vendor/lib64/hw/audio.primary.default.so
+ExecStart=/bin/mount -o bind /system/lib64/hw/audio.hidl_compat.default.so /vendor/lib64/hw/audio.primary.default.so
 
 [Install]
 WantedBy=graphical.target

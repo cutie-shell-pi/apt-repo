@@ -1,0 +1,64 @@
+name: Build arm64 Debian Package (Native)
+
+on:
+  push:
+    branches: [ 'droidian-halium-13' ] 
+  pull_request:
+    branches: [ 'droidian-halium-13' ]
+    
+permissions:
+  contents: write
+  packages: write
+  repository-projects: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set build metadata
+        id: vars
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Install Build Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y devscripts equivs build-essential
+
+      - name: Install Dependencies
+        run: |
+          # Automatically satisfies dependencies from debian/control
+          sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+
+      - name: Build .deb Package
+        run: |
+          dpkg-buildpackage -us -uc -b
+          # Create a local folder and move the results into it
+          mkdir -p output
+          mv ../*.deb output/
+          mv ../*.changes output/ || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: adaptation-samsung-r8q-${{ github.ref_name }}-${{ steps.vars.outputs.date }}
+          path: output/
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/droidian-halium-13'
+        with:
+          tag_name: latest-samsung-s20fe
+          name: Latest Samsung S20 FE Adaptation Build
+          body: |
+            Automated build for Samsung Galaxy S20 FE (r8q).
+            Built on: ${{ steps.vars.outputs.date }}
+            Branch: ${{ github.ref_name }}
+          files: output/*.deb
+          prerelease: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

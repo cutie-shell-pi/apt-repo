@@ -1,13 +1,13 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: adaptation-motorola-sofia
-Source: https://github.com/arpio23/adaptation-motorola-sofia
+Upstream-Name: adaptation-samsung-s20fe
+Source: https://github.com/mathew-dennis/adaptation-samsung-s20fe
 
 Files: *
-Copyright: 2022 arpio <alex@familyrutz.com>
+Copyright: 2026 Mathew Dennis <mathewdennis693@gmail.com>
 License: BSD-3-clause
 
 Files: debian/*
-Copyright: 2022 arpio <alex@familyrutz.com>
+Copyright: 2026 Mathew Dennis <mathewdennis693@gmail.com>
 License: BSD-3-clause
 
 License: BSD-3-clause
