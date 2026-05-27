@@ -29,8 +29,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            devscripts equivs build-essential \
-            apt-utils dpkg-dev apt-ftparchive
+            devscripts \
+            equivs \
+            build-essential \
+            dpkg-dev \
+            apt-utils \
+            apt
+          apt-ftparchive --version
 
       - name: Install Dependencies
         run: |
@@ -79,7 +84,6 @@ jobs:
 
       - name: Generate APT repository structure
         env:
-          GPG_TTY: $(tty)
           GNUPGHOME: /home/runner/.gnupg
           GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -113,6 +117,7 @@ jobs:
           Components: main
           Description: Droidian adaptation packages for Samsung Galaxy S20 FE
           EOF
+
           apt-ftparchive release . >> Release
 
           # Sign Release with GPG
@@ -143,19 +148,20 @@ jobs:
               body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; }
               pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
               h1, h2 { font-family: sans-serif; }
+              a { color: #0066cc; }
             </style>
           </head>
           <body>
             <h1>Samsung S20 FE Droidian APT Repository</h1>
 
-            <h2>Add GPG key</h2>
+            <h2>1. Add GPG key</h2>
             <pre>curl ${REPO_URL}/s20fe-repo.gpg | sudo tee /etc/apt/trusted.gpg.d/s20fe.gpg</pre>
 
-            <h2>Add repository</h2>
+            <h2>2. Add repository</h2>
             <pre>echo "deb ${REPO_URL} stable main" | sudo tee /etc/apt/sources.list.d/s20fe.list
           sudo apt-get update</pre>
 
-            <h2>Install adaptation</h2>
+            <h2>3. Install adaptation</h2>
             <pre>sudo apt-get install adaptation-samsung-s20fe</pre>
 
             <h2>Available Packages</h2>
