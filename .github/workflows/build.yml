@@ -1,7 +1,7 @@
 name: Centralized Org APT Auto-Scanner & Publisher
 
 on:
-  workflow_dispatch: # Single-click manual button
+  workflow_dispatch: # Single-click manual button with no inputs
   schedule:
     - cron: '0 */6 * * *' # Automated check every 6 hours
 
@@ -20,7 +20,7 @@ jobs:
         with:
           ref: gh-pages
           path: public
-        continue-on-error: true
+        continue-on-error: true # Safely ignores failures on the very first run
 
       - name: Install Build & Parsing Tools
         run: |
@@ -28,11 +28,11 @@ jobs:
           sudo apt-get install -y devscripts equivs build-essential dpkg-dev apt-utils apt jq
           mkdir -p new-output
 
-      - name: Scan Organization Repositories
+      - name: Scan Account Repositories
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ORG="${{ github.repository_owner }}"
+          OWNER="${{ github.repository_owner }}"
           CURRENT_REPO="${{ github.event.repository.name }}"
           
           # Initialize metadata tracking state file if missing
@@ -40,8 +40,18 @@ jobs:
             echo "{}" > public/state.json
           fi
 
-          echo "Fetching public repositories for organization: $ORG..."
-          REPOS=$(gh api orgs/$ORG/repos --paginate --jq '.[] | select(.fork == false) | .name')
+          # Determine if OWNER is an Organization or a Personal User Account dynamically
+          ACCOUNT_TYPE=$(gh api users/$OWNER --jq '.type')
+          echo "Account Type Detected: $ACCOUNT_TYPE for owner $OWNER"
+
+          if [ "$ACCOUNT_TYPE" = "Organization" ]; then
+            REPOS=$(gh api orgs/$OWNER/repos --paginate --jq '.[] | select(.fork == false) | .name')
+          else
+            # If it's a regular user account, fetch all public repositories owned by this user
+            REPOS=$(gh api users/$OWNER/repos --paginate --jq '.[] | select(.fork == false and .private == false) | .name')
+          fi
+
+          echo "Found repositories to check: $(echo $REPOS | tr '\n' ' ')"
 
           for REPO in $REPOS; do
             if [ "$REPO" = "$CURRENT_REPO" ]; then
@@ -49,11 +59,17 @@ jobs:
             fi
 
             echo "--------------------------------------------------"
-            echo "Checking entry: $REPO"
+            echo "Processing Repository: $REPO"
             
-            LATEST_SHA=$(gh api repos/$ORG/$REPO/commits/HEAD --jq '.sha' 2>/dev/null || echo "")
+            # Try getting HEAD commit SHA. If it fails, look up the explicit default branch
+            LATEST_SHA=$(gh api repos/$OWNER/$REPO/commits/HEAD --jq '.sha' 2>/dev/null || echo "")
             if [ -z "$LATEST_SHA" ]; then
-              echo " -> Could not resolve default branch HEAD for $REPO. Skipping."
+              DEFAULT_BRANCH=$(gh api repos/$OWNER/$REPO --jq '.default_branch' 2>/dev/null || echo "main")
+              LATEST_SHA=$(gh api repos/$OWNER/$REPO/commits/$DEFAULT_BRANCH --jq '.sha' 2>/dev/null || echo "")
+            fi
+
+            if [ -z "$LATEST_SHA" ]; then
+              echo " -> [SKIP] Could not resolve any commit SHA for $REPO. Is the repository completely empty?"
               continue
             fi
 
@@ -61,40 +77,59 @@ jobs:
             LAST_SHA=$(jq -r --arg repo "$REPO" '.[$repo].sha // ""' public/state.json)
 
             if [ "$LATEST_SHA" = "$LAST_SHA" ]; then
-              echo " -> No new commits detected ($LATEST_SHA). Up to date."
+              echo " -> [OK] No new commits detected ($LATEST_SHA). Already up to date."
               continue
             fi
 
-            echo " -> New changes found! (Old: ${LAST_SHA:-None} -> New: $LATEST_SHA)"
+            # Dynamic structural detection: check for debian/control at root level or one sub-level deep
+            HAS_DEBIAN=$(gh api repos/$OWNER/$REPO/contents/debian/control --jq '.name' 2>/dev/null || echo "")
+            DEBIAN_PATH="debian/control"
             
-            HAS_DEBIAN=$(gh api repos/$ORG/$REPO/contents/debian/control --jq '.name' 2>/dev/null || echo "")
             if [ -z "$HAS_DEBIAN" ]; then
-              echo " -> Repository does not contain debian/control. Marking as skipped."
+              # Look for it inside a nested subdirectory if root is empty
+              NESTED_CHECK=$(gh api repos/$OWNER/$REPO/search/code?q=filename:control+path:debian --jq '.items[0].path' 2>/dev/null || echo "")
+              if [ -n "$NESTED_CHECK" ]; then
+                HAS_DEBIAN="control"
+                DEBIAN_PATH="$NESTED_CHECK"
+                echo " -> Found debian configuration nested at: $DEBIAN_PATH"
+              fi
+            fi
+
+            if [ -z "$HAS_DEBIAN" ]; then
+              echo " -> [SKIP] No 'debian/control' file found anywhere in $REPO. Skipping compilation."
+              # Store state so we don't spam the API on unchanged repos
               jq --arg repo "$REPO" --arg sha "$LATEST_SHA" '.[$repo] = {sha: $sha, date: "N/A", packages: "No debian/control"}' public/state.json > tmp.json && mv tmp.json public/state.json
               continue
             fi
 
-            echo " -> Valid Debian package package found. Proceeding to build..."
+            echo " -> [BUILDING] New changes found! Proceeding to clone and compile..."
             
             rm -rf source-code
-            git clone --depth 1 https://github.com/$ORG/$REPO.git source-code
+            git clone --depth 1 https://github.com/$OWNER/$REPO.git source-code
             
             cd source-code
+            # Navigate to where debian/control actually lives if it's nested
+            DEBIAN_DIR=$(dirname "$DEBIAN_PATH")
+            if [ "$DEBIAN_DIR" != "debian" ] && [ "$DEBIAN_DIR" != "." ]; then
+              cd $(dirname "$DEBIAN_DIR")
+            fi
+
             sudo mk-build-deps --install \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
-              debian/control || echo "Dependency installation experienced warnings."
+              debian/control || echo "Dependency warnings encountered."
 
-            dpkg-buildpackage -us -uc -b || echo "Build failed for $REPO."
+            dpkg-buildpackage -us -uc -b || echo "Compilation failed for $REPO."
             
-            cd ..
+            # Return to the central workspace root
+            cd "${{ github.workspace }}"
             
             # Parse produced debian package names out before clean up strings
             BUILT_PACKAGES=$(find . -maxdepth 1 -name "*.deb" -exec basename {} \; | sed 's/_.*//' | tr '\n' ',' | sed 's/,$//' | sed 's/,/, /g')
             
             if [ -z "$BUILT_PACKAGES" ]; then
-              echo " -> Warning: No deb packages were generated by this compilation run."
+              echo " -> [ERROR] Compilation finished but no .deb binary packages were captured."
             else
-              echo " -> Successfully built packages: $BUILT_PACKAGES"
+              echo " -> [SUCCESS] Packages produced: $BUILT_PACKAGES"
               mv *.deb new-output/ 2>/dev/null || true
               mv *.changes new-output/ 2>/dev/null || true
               
@@ -129,13 +164,17 @@ jobs:
           mkdir -p public/pool/main
           mkdir -p public/dists/stable/main/binary-arm64
 
+          # Integrate any freshly generated packages into our primary pool
           if [ "$(ls -A new-output/*.deb 2>/dev/null)" ]; then
             cp new-output/*.deb public/pool/main/
           fi
 
+          # Export public GPG verification key
           gpg --armor --export $GPG_KEY_ID > public/repo.gpg
 
           cd public
+          
+          # Rebuild entire package registry index
           dpkg-scanpackages --arch arm64 pool/main /dev/null > dists/stable/main/binary-arm64/Packages
           gzip -k -f dists/stable/main/binary-arm64/Packages
 
@@ -152,6 +191,8 @@ jobs:
           EOF
 
           apt-ftparchive release . >> Release
+
+          # Re-sign repository definitions
           echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --default-key $GPG_KEY_ID --clearsign -o InRelease Release
           echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --default-key $GPG_KEY_ID -abs -o Release.gpg Release
 
