@@ -30,12 +30,21 @@ jobs:
 
       - name: Scan Account Repositories
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # The auto-generated secrets.GITHUB_TOKEN is an installation token scoped
+          # ONLY to this repo - it cannot list or read sibling repos in the org, even
+          # public ones. Use a PAT instead (classic PAT with `repo` + `read:org` scopes,
+          # or a fine-grained PAT scoped to the org with Contents:Read + Metadata:Read
+          # on all repos), stored as the ORG_SCAN_TOKEN secret.
+          GH_TOKEN: ${{ secrets.ORG_SCAN_TOKEN }}
         run: |
           OWNER="${{ github.repository_owner }}"
-          CURRENT_REPO="${{ github.event.repository.name }}"
+          # github.event.repository.name depends on the event payload and isn't always
+          # populated (e.g. some schedule contexts). GITHUB_REPOSITORY (owner/repo) is
+          # always set by the runner, so derive the name from that instead.
+          CURRENT_REPO="${GITHUB_REPOSITORY#*/}"
           
           # Initialize metadata tracking state file if missing
+          mkdir -p public
           if [ ! -f public/state.json ]; then
             echo "{}" > public/state.json
           fi
@@ -52,6 +61,7 @@ jobs:
           fi
 
           echo "Found repositories to check: $(echo $REPOS | tr '\n' ' ')"
+          echo "Total repositories to scan: $(echo "$REPOS" | grep -c . || echo 0)"
 
           for REPO in $REPOS; do
             if [ "$REPO" = "$CURRENT_REPO" ]; then
@@ -87,7 +97,7 @@ jobs:
             
             if [ -z "$HAS_DEBIAN" ]; then
               # Look for it inside a nested subdirectory if root is empty
-              NESTED_CHECK=$(gh api repos/$OWNER/$REPO/search/code?q=filename:control+path:debian --jq '.items[0].path' 2>/dev/null || echo "")
+              NESTED_CHECK=$(gh api -X GET search/code -f q="filename:control path:debian repo:$OWNER/$REPO" --jq '.items[0].path' 2>/dev/null || echo "")
               if [ -n "$NESTED_CHECK" ]; then
                 HAS_DEBIAN="control"
                 DEBIAN_PATH="$NESTED_CHECK"
@@ -105,7 +115,7 @@ jobs:
             echo " -> [BUILDING] New changes found! Proceeding to clone and compile..."
             
             rm -rf source-code
-            git clone --depth 1 https://github.com/$OWNER/$REPO.git source-code
+            git clone --depth 1 https://x-access-token:${GH_TOKEN}@github.com/$OWNER/$REPO.git source-code
             
             cd source-code
             # Navigate to where debian/control actually lives if it's nested
