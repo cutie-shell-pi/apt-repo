@@ -1,9 +1,17 @@
-name: Build and Publish cutie-pi packages
+name: Centralized Org APT Builder & Publisher
 
 on:
-  push:          # Automatically triggers on any new commit pushed to any branch by anyone
-  pull_request:  # Automatically triggers on any pull request activity
+  repository_dispatch:
+    types: [build-and-publish]
   workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Repository to build (e.g., your-org/cutie-shell)'
+        required: true
+      target_ref:
+        description: 'Branch or tag to build (e.g., refs/heads/main)'
+        required: true
+        default: 'refs/heads/main'
 
 permissions:
   contents: write
@@ -13,72 +21,77 @@ permissions:
 jobs:
   build-and-publish:
     runs-on: ubuntu-24.04-arm
-    # Ensures publishing safely runs on direct pushes/merges. 
-    # If you want pull requests to also publish directly to production Pages/Releases, remove this 'if' line.
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set build metadata
+      - name: Determine Target Repository
         id: vars
         run: |
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            echo "repo=${{ github.event.client_payload.repository }}" >> $GITHUB_OUTPUT
+            echo "ref=${{ github.event.client_payload.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "repo=${{ inputs.target_repo }}" >> $GITHUB_OUTPUT
+            echo "ref=${{ inputs.target_ref }}" >> $GITHUB_OUTPUT
+          fi
           echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Extract Repo Name for Release Tags
+        id: repo_name
+        run: echo "short=$(echo ${{ steps.vars.outputs.repo }} | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+
+      - name: Checkout Target Code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.vars.outputs.repo }}
+          ref: ${{ steps.vars.outputs.ref }}
+          path: source-code
+          # No token required here because all source repositories are public
+
+      - name: Checkout Existing APT Pages Pool
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: public
+        continue-on-error: true # Safely ignores failures on the very first run
 
       - name: Install Build Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            devscripts \
-            equivs \
-            build-essential \
-            dpkg-dev \
-            apt-utils \
-            apt
+          sudo apt-get install -y devscripts equivs build-essential dpkg-dev apt-utils apt
           apt-ftparchive --version
 
       - name: Install Dependencies
+        working-directory: source-code
         run: |
           sudo mk-build-deps --install \
             --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
             debian/control
 
       - name: Build .deb Package
+        working-directory: source-code
         run: |
           dpkg-buildpackage -us -uc -b
-          mkdir -p output
-          mv ../*.deb output/
-          mv ../*.changes output/ || true
+          mkdir -p ../new-output
+          mv ../*.deb ../new-output/
+          mv ../*.changes ../new-output/ || true
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          # Appended short SHA to keep simultaneous builds by different team members distinct
-          name: adaptation-samsung-s20fe-${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}
-          path: output/
-
-      - name: Create GitHub Release
+      - name: Create Target-Specific GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-samsung-s20fe
-          name: Latest Samsung S20 FE Adaptation Build
+          tag_name: latest-${{ steps.repo_name.outputs.short }}
+          name: Latest Build - ${{ steps.repo_name.outputs.short }}
           body: |
-            Automated build for Samsung Galaxy S20 FE (r8q).
+            Automated build triggered by ${{ steps.vars.outputs.repo }}.
+            Branch/Ref: ${{ steps.vars.outputs.ref }}
             Built on: ${{ steps.vars.outputs.date }}
-            Branch: ${{ github.ref_name }}
-            Commit: ${{ github.sha }}
-          files: output/*.deb
+          files: new-output/*.deb
           prerelease: true
-          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Import GPG key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch
           echo "allow-preset-passphrase" > ~/.gnupg/gpg-agent.conf
@@ -97,45 +110,35 @@ jobs:
           mkdir -p public/pool/main
           mkdir -p public/dists/stable/main/binary-arm64
 
-          # Copy debs to pool
-          cp output/*.deb public/pool/main/
+          # Copy newly built debs into the existing pool
+          cp new-output/*.deb public/pool/main/
 
-          # Export public GPG key for users
-          gpg --armor --export $GPG_KEY_ID > public/s20fe-repo.gpg
+          # Export public GPG key
+          gpg --armor --export $GPG_KEY_ID > public/repo.gpg
 
-          # Generate Packages index
           cd public
-          dpkg-scanpackages --arch arm64 pool/main /dev/null \
-            > dists/stable/main/binary-arm64/Packages
+          
+          # Rebuild the packages index with both old and new files
+          dpkg-scanpackages --arch arm64 pool/main /dev/null > dists/stable/main/binary-arm64/Packages
           gzip -k -f dists/stable/main/binary-arm64/Packages
 
-          # Generate Release file
           cd dists/stable
           cat << EOF > Release
           Origin: https://$USER.github.io/$REPO
-          Label: Samsung S20 FE Droidian
+          Label: Organization APT Repository
           Suite: stable
           Codename: stable
           Version: 1.0
           Architectures: arm64
           Components: main
-          Description: Droidian adaptation packages for Samsung Galaxy S20 FE
+          Description: Centralized Debian packages for the organization
           EOF
 
           apt-ftparchive release . >> Release
 
-          # Sign Release with GPG
-          echo "$GPG_PASSPHRASE" | gpg --batch --yes \
-            --pinentry-mode loopback \
-            --passphrase-fd 0 \
-            --default-key $GPG_KEY_ID \
-            --clearsign -o InRelease Release
-
-          echo "$GPG_PASSPHRASE" | gpg --batch --yes \
-            --pinentry-mode loopback \
-            --passphrase-fd 0 \
-            --default-key $GPG_KEY_ID \
-            -abs -o Release.gpg Release
+          # Sign Release
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --default-key $GPG_KEY_ID --clearsign -o InRelease Release
+          echo "$GPG_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --default-key $GPG_KEY_ID -abs -o Release.gpg Release
 
       - name: Generate index page
         env:
@@ -147,37 +150,20 @@ jobs:
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Samsung S20 FE Droidian APT Repo</title>
+            <title>Organization APT Repository</title>
             <style>
               body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; }
               pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
               h1, h2 { font-family: sans-serif; }
-              a { color: #0066cc; }
             </style>
           </head>
           <body>
-            <h1>Samsung S20 FE Droidian APT Repository</h1>
-
+            <h1>Organization APT Repository</h1>
             <h2>1. Add GPG key</h2>
-            <pre>curl ${REPO_URL}/s20fe-repo.gpg | sudo tee /etc/apt/trusted.gpg.d/s20fe.gpg</pre>
-
+            <pre>curl ${REPO_URL}/repo.gpg | sudo tee /etc/apt/trusted.gpg.d/org-repo.gpg</pre>
             <h2>2. Add repository</h2>
-            <pre>echo "deb ${REPO_URL} stable main" | sudo tee /etc/apt/sources.list.d/s20fe.list
+            <pre>echo "deb ${REPO_URL} stable main" | sudo tee /etc/apt/sources.list.d/org-repo.list
           sudo apt-get update</pre>
-
-            <h2>3. Install adaptation</h2>
-            <pre>sudo apt-get install adaptation-samsung-s20fe</pre>
-
-            <h2>Available Packages</h2>
-            <ul>
-              <li>adaptation-samsung-s20fe</li>
-              <li>adaptation-samsung-s20fe-configs</li>
-            </ul>
-
-            <h2>Direct Download</h2>
-            <p>Packages are also available as direct downloads on the
-            <a href="https://github.com/$USER/$REPO/releases/tag/latest-samsung-s20fe">
-            GitHub Releases page</a>.</p>
           </body>
           </html>
           EOF
