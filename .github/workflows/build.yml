@@ -281,3 +281,24 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           force_orphan: true
+
+      - name: Publish Rolling GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$(ls -A public/pool/main/*.deb 2>/dev/null)" ]; then
+            echo "No .deb packages in the pool yet, skipping release."
+            exit 0
+          fi
+
+          TAG="latest"
+          # Delete the previous rolling release + tag first so this release always
+          # reflects exactly the current pool contents - no stale assets from
+          # packages that have since been removed or renamed pile up over time.
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "Latest Packages ($(date +'%Y-%m-%d %H:%M UTC'))" \
+            --notes "Automated rolling release of all currently built arm64 packages. Generated $(date +'%Y-%m-%d %H:%M:%S UTC'). See the repo's index page for per-package build status." \
+            public/pool/main/*.deb
