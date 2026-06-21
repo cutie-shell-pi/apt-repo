@@ -320,7 +320,7 @@ jobs:
           # Delete the previous rolling release + tag first so this release always
           # reflects exactly the current pool contents - no stale assets from
           # packages that have since been removed or renamed pile up over time.
-          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release delete "$TAG" --repo "${{ github.repository }}" --yes --cleanup-tag || echo " -> No existing '$TAG' release to delete (first run, or already clean)."
 
           gh release create "$TAG" \
             --repo "${{ github.repository }}" \
