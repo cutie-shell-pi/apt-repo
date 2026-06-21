@@ -54,10 +54,10 @@ jobs:
           echo "Account Type Detected: $ACCOUNT_TYPE for owner $OWNER"
 
           if [ "$ACCOUNT_TYPE" = "Organization" ]; then
-            REPOS=$(gh api orgs/$OWNER/repos --paginate --jq '.[] | select(.fork == false) | .name')
+            REPOS=$(gh api orgs/$OWNER/repos --paginate --jq '.[] | .name')
           else
             # If it's a regular user account, fetch all public repositories owned by this user
-            REPOS=$(gh api users/$OWNER/repos --paginate --jq '.[] | select(.fork == false and .private == false) | .name')
+            REPOS=$(gh api users/$OWNER/repos --paginate --jq '.[] | select(.private == false) | .name')
           fi
 
           echo "Found repositories to check: $(echo $REPOS | tr '\n' ' ')"
