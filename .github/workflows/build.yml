@@ -124,6 +124,16 @@ jobs:
               cd $(dirname "$DEBIAN_DIR")
             fi
 
+            # dpkg-buildpackage requires debian/changelog to exist - generate one
+            # on the fly (date-based version) if the repo doesn't ship it. This is
+            # build-local only and never committed back to the source repo.
+            if [ ! -f debian/changelog ]; then
+              echo " -> No debian/changelog found, generating one for this build..."
+              PKG_NAME=$(grep -m1 '^Source:' debian/control | sed 's/Source:[[:space:]]*//')
+              BUILD_VERSION="1.0.0~git$(date +'%Y%m%d')-1"
+              printf '%s (%s) stable; urgency=medium\n\n  * Auto-generated changelog for CI build (no debian/changelog in source repo).\n\n -- Cutie Org APT Scanner <actions@github.com>  %s\n' "$PKG_NAME" "$BUILD_VERSION" "$(date -R)" > debian/changelog
+            fi
+
             sudo mk-build-deps --install \
               --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' \
               debian/control || echo "Dependency warnings encountered."
