@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     steps:
-      - name: Checkout Existing APT Pages Pool & State
+      - name: Checkout Existing State & Package Pool
         uses: actions/checkout@v4
         with:
-          ref: gh-pages
+          ref: state
           path: public
         continue-on-error: true # Safely ignores failures on the very first run
 
@@ -280,13 +280,38 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+          publish_branch: state
           force_orphan: true
+
+      - name: Upload Package Pool Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-packages
+          path: public/pool/main/*.deb
+          if-no-files-found: ignore
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  release:
+    needs: scan-and-build
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: write
+    steps:
+      - name: Download Package Pool Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deb-packages
+          path: pool
 
       - name: Publish Rolling GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$(ls -A public/pool/main/*.deb 2>/dev/null)" ]; then
+          if [ -z "$(ls -A pool/*.deb 2>/dev/null)" ]; then
             echo "No .deb packages in the pool yet, skipping release."
             exit 0
           fi
@@ -301,4 +326,15 @@ jobs:
             --repo "${{ github.repository }}" \
             --title "Latest Packages ($(date +'%Y-%m-%d %H:%M UTC'))" \
             --notes "Automated rolling release of all currently built arm64 packages. Generated $(date +'%Y-%m-%d %H:%M:%S UTC'). See the repo's index page for per-package build status." \
-            public/pool/main/*.deb
+            pool/*.deb
+
+  deploy-pages:
+    needs: scan-and-build
+    runs-on: ubuntu-24.04-arm
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
