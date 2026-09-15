@@ -1,0 +1,27 @@
+{
+  "cutie-settings": {
+    "sha": "a63dbe73c2e02cd182cefb3b1397a8c3ed2ecaa9",
+    "date": "2026-07-10 09:24:17 UTC",
+    "packages": "cutie-settings"
+  },
+  "libcutiewaydroid": {
+    "sha": "37724e1fa9e7ded1b4d7531a19adbeba5c398691",
+    "date": "2026-06-21 21:37:06 UTC",
+    "packages": "libcutiewaydroid, libcutiewaydroid-dev, qml6-module-cutiewaydroid"
+  },
+  "libcutiedesktopfileparser": {
+    "sha": "a1647854be91eebee559d5a8305196e91fd405a9",
+    "date": "2026-06-22 11:23:07 UTC",
+    "packages": "qml6-module-cutiedesktopfileparser, libcutiedesktopfileparser, libcutiedesktopfileparser-dev"
+  },
+  "libcutiesysteminfo": {
+    "sha": "b84c2bd1c08a5e691eb47863f6586d7917e1807b",
+    "date": "2026-06-22 14:22:01 UTC",
+    "packages": "libcutiesysteminfo-dev, qml6-module-cutiesysteminfo, libcutiesysteminfo"
+  },
+  "libcutiedatetime": {
+    "sha": "6fc23850f8505f7c0cec1fc304b8bf223cd8f76c",
+    "date": "2026-06-22 15:25:43 UTC",
+    "packages": "libcutiedatetime-dev, qml6-module-cutiedatetime, libcutiedatetime"
+  }
+}
