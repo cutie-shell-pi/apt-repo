@@ -38,9 +38,6 @@ jobs:
           GH_TOKEN: ${{ secrets.ORG_SCAN_TOKEN }}
         run: |
           OWNER="${{ github.repository_owner }}"
-          # github.event.repository.name depends on the event payload and isn't always
-          # populated (e.g. some schedule contexts). GITHUB_REPOSITORY (owner/repo) is
-          # always set by the runner, so derive the name from that instead.
           CURRENT_REPO="${GITHUB_REPOSITORY#*/}"
           
           # Initialize metadata tracking state file if missing
@@ -49,9 +46,26 @@ jobs:
             echo "{}" > public/state.json
           fi
 
+          # 1. SETUP LOCAL APT REPOSITORY FOR DEPENDENCY RESOLUTION
+          mkdir -p local-apt-repo
+          # Seed with any existing packages from previous workflow runs
+          cp public/pool/main/*.deb local-apt-repo/ 2>/dev/null || true
+          
+          # Mark as trusted so we don't need GPG signing for the local build cache
+          echo "deb [trusted=yes] file://$GITHUB_WORKSPACE/local-apt-repo ./" | sudo tee /etc/apt/sources.list.d/local-ci.list
+          
+          update_local_apt() {
+            echo " -> Updating local APT repository cache..."
+            (cd local-apt-repo && dpkg-scanpackages . /dev/null > Packages 2>/dev/null)
+            sudo apt-get update -y -q -o Dir::Etc::sourcelist="sources.list.d/local-ci.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+          }
+          
+          # Initialize the local repo so mk-build-deps can see historical packages
+          update_local_apt
+
           # Determine if OWNER is an Organization or a Personal User Account dynamically
           ACCOUNT_TYPE=$(gh api users/$OWNER --jq '.type')
-          echo "Account Type Detected: $ACCOUNT_TYPE for owner $OWNER"
+          echo "Account Type Detected: $ACCOUNT_TYPE for owner$OWNER"
 
           if [ "$ACCOUNT_TYPE" = "Organization" ]; then
             REPOS=$(gh api orgs/$OWNER/repos --paginate --jq '.[] | .name')
@@ -60,10 +74,22 @@ jobs:
             REPOS=$(gh api users/$OWNER/repos --paginate --jq '.[] | select(.private == false) | .name')
           fi
 
-          echo "Found repositories to check: $(echo $REPOS | tr '\n' ' ')"
-          echo "Total repositories to scan: $(echo "$REPOS" | grep -c . || echo 0)"
-
+          # 2. TWO-PASS SORTING: QUEUE 'lib*' REPOSITORIES FIRST
+          LIB_REPOS=""
+          APP_REPOS=""
           for REPO in $REPOS; do
+            if [[ "$REPO" == lib* ]]; then
+              LIB_REPOS="$LIB_REPOS$REPO"
+            else
+              APP_REPOS="$APP_REPOS$REPO"
+            fi
+          done
+          
+          SORTED_REPOS="$LIB_REPOS$APP_REPOS"
+          echo "Found repositories to check (Library priority order): $SORTED_REPOS"
+          echo "Total repositories to scan: $(echo "$SORTED_REPOS" | wc -w)"
+
+          for REPO in $SORTED_REPOS; do
             if [ "$REPO" = "$CURRENT_REPO" ]; then
               continue
             fi
@@ -108,7 +134,7 @@ jobs:
             if [ -z "$HAS_DEBIAN" ]; then
               echo " -> [SKIP] No 'debian/control' file found anywhere in $REPO. Skipping compilation."
               # Store state so we don't spam the API on unchanged repos
-              jq --arg repo "$REPO" --arg sha "$LATEST_SHA" '.[$repo] = {sha: $sha, date: "N/A", packages: "No debian/control"}' public/state.json > tmp.json && mv tmp.json public/state.json
+              jq --arg repo "$REPO" --arg sha "$LATEST_SHA" '.[$repo] = {sha:$sha, date: "N/A", packages: "No debian/control"}' public/state.json > tmp.json && mv tmp.json public/state.json
               continue
             fi
 
@@ -125,8 +151,7 @@ jobs:
             fi
 
             # dpkg-buildpackage requires debian/changelog to exist - generate one
-            # on the fly (date-based version) if the repo doesn't ship it. This is
-            # build-local only and never committed back to the source repo.
+            # on the fly (date-based version) if the repo doesn't ship it.
             if [ ! -f debian/changelog ]; then
               echo " -> No debian/changelog found, generating one for this build..."
               PKG_NAME=$(grep -m1 '^Source:' debian/control | sed 's/Source:[[:space:]]*//')
@@ -156,7 +181,12 @@ jobs:
               # Record timestamps along with output binaries mapping
               CURRENT_DATE=$(date +'%Y-%m-%d %H:%M:%S UTC')
               jq --arg repo "$REPO" --arg sha "$LATEST_SHA" --arg date "$CURRENT_DATE" --arg pkgs "$BUILT_PACKAGES" \
-                '.[$repo] = {sha: $sha, date: $date, packages: $pkgs}' public/state.json > tmp.json && mv tmp.json public/state.json
+                '.[$repo] = {sha:$sha, date: $date, packages:$pkgs}' public/state.json > tmp.json && mv tmp.json public/state.json
+
+              # 3. INJECT COMPILED PACKAGES INTO LOCAL CACHE FOR DOWNSTREAM BUILDS
+              echo " -> [SYSTEM] Adding new packages to local cache for future dependencies..."
+              cp new-output/*.deb local-apt-repo/
+              update_local_apt
             fi
             rm -rf source-code
           done
