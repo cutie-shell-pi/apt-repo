@@ -79,13 +79,13 @@ jobs:
           APP_REPOS=""
           for REPO in $REPOS; do
             if [[ "$REPO" == lib* ]]; then
-              LIB_REPOS="$LIB_REPOS$REPO"
+              LIB_REPOS="$LIB_REPOS $REPO"
             else
-              APP_REPOS="$APP_REPOS$REPO"
+              APP_REPOS="$APP_REPOS $REPO"
             fi
           done
           
-          SORTED_REPOS="$LIB_REPOS$APP_REPOS"
+          SORTED_REPOS="$LIB_REPOS $APP_REPOS"
           echo "Found repositories to check (Library priority order): $SORTED_REPOS"
           echo "Total repositories to scan: $(echo "$SORTED_REPOS" | wc -w)"
 
