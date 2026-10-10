@@ -1,0 +1,44 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: https://cutie-shell-pi.github.io/apt-repo
+Label: Organization APT Repository
+Suite: stable
+Codename: stable
+Version: 1.0
+Architectures: arm64
+Components: main
+Description: Centralized Debian packages for the organization
+Date: Sat, 10 Oct 2026 20:53:52 +0000
+MD5Sum:
+ 63f3acde2d8527d235777677566428c2              267 Release
+ 73de38e4e0b2dabb7fa1e930c9041922            11370 main/binary-arm64/Packages
+ 2e619c2352a7f6d22145b09933e979df             3171 main/binary-arm64/Packages.gz
+SHA1:
+ 1a398e8d24a64e20e319aca889cf31b5cc18085c              267 Release
+ 76f023cf36bc3b049a64634fcf677f76ea6692e6            11370 main/binary-arm64/Packages
+ fc853f73aef1446d5e4253ff9456f0362661320d             3171 main/binary-arm64/Packages.gz
+SHA256:
+ 16a69316058991f5f59937eaddd839470faba9ad06c4bfd4761b7f32c58f36bc              267 Release
+ 5e9c3283ed35153cc0d60aacb5466d4b40adc499ba50c91531012777d41ad42e            11370 main/binary-arm64/Packages
+ aa0c1a6009fc4d3c731eebcd0c1990134b2ef7b067c0024b85943f276f26d1e8             3171 main/binary-arm64/Packages.gz
+SHA512:
+ 927e232bdce41f369b96bf9bb63a1ceba80856e20f21c813dd6c6903c25a979f67b6489948c375cf96893d7b7c018832cf2c169c879425493281105a114953a9              267 Release
+ c4056c7405e32e87ac99ce751350640d451cc02874163d805fd81170dc55522094c5e0ef21a4b56a1019e434745f29730322b94bdece504da5d41cf4d595ac0f            11370 main/binary-arm64/Packages
+ 75d8aab13f0027f16ed8b8771a65197bb9ea29919c4e2ad6e1f6bc7533aa1d2094c4e851a227370ab46493d8e0bd421988fbd7c3cfd8fd53a33788584eb56a12             3171 main/binary-arm64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE1eOwtLCgwbh027RqqbDh1XAkof4FAmrKpeAACgkQqbDh1XAk
+of6JOxAAyHnsm2qaRbPDmpLd0rZ6g9AU1cRGdWo0FyJ8C3vWvlG8HwKt050zVyzm
+xzyTCcSvWWeaQb/zvFoCqbu8gft3diE695JvunwP0jHw3OTFqvvYzv+vUEhio+O+
+RWYXL1yJShrwdS3SurDlLjGO/Ut0kFMABuZU1UbBvA23i2/wOMSRThb3y7DabvjW
+9MxEG6I7A16/0H6W502RaGSKEOoTeM5r50cIgfPBiGZ/biGfYSJ2VY41T7pmqvZy
++grFhV+ErIFOXFJJHPIvKKtik4uqltlu1RS40PQdOxCU+X8fZVTmUDvAcH6nTBFA
+ctYH9ok4pMeeQcN6rm4+5DW/YDM3/LW0eoTGSu6oi7Om8mIXh9IoF1RSCF+zF7lW
+7AAZGXyj96scibJGYpZR88dzGFA9FuXxnhbtSO1cvl7JGP+wGBOoI88eT2leh8SM
+Vv/E0bSWN7nzbRZH6Y+9vwCopRi3FtKUjFfu98z5SFXNYJcAT31wjfGGphGtGKAg
+P/MeJGbCmHZaECDyir9YXdWM3UqxvFk//ulK830cJeS0Cr34tFbNIh4kLsc8tKD0
+K3BkHqL8TOWC2RPM6h1BfhVGxZ6SP6bJtp7hgIcq1zogNQgNukYAVHNljNEYD5YP
+g0XtqhSdjeRjg6DmT+cnYX399s3QaSbl0gJuYaGRnMeeYC4idQ4=
+=tA4+
+-----END PGP SIGNATURE-----
