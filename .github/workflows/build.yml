@@ -55,9 +55,13 @@ jobs:
           echo "deb [trusted=yes] file://$GITHUB_WORKSPACE/local-apt-repo ./" | sudo tee /etc/apt/sources.list.d/local-ci.list
           
           update_local_apt() {
-            echo " -> Updating local APT repository cache..."
-            (cd local-apt-repo && dpkg-scanpackages . /dev/null > Packages 2>/dev/null)
-            sudo apt-get update -y -q -o Dir::Etc::sourcelist="sources.list.d/local-ci.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+                      echo " -> Updating local APT repository cache..."
+                      cd local-apt-repo
+                      touch Packages
+                      chmod 666 Packages
+                      dpkg-scanpackages . /dev/null > Packages 2>/dev/null
+                      cd ..
+                      sudo apt-get update -y -q -o Dir::Etc::sourcelist="sources.list.d/local-ci.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
           }
           
           # Initialize the local repo so mk-build-deps can see historical packages
