@@ -1,0 +1,25 @@
+Origin: https://cutie-shell-pi.github.io/apt-repo
+Label: Organization APT Repository
+Suite: stable
+Codename: stable
+Version: 1.0
+Architectures: arm64
+Components: main
+Description: Centralized Debian packages for the organization
+Date: Sat, 24 Oct 2026 09:59:54 +0000
+MD5Sum:
+ fdd8758e4287752461bf5efa8d3cf0ec              267 Release
+ 1bfa3d1d8eccf83738f39ff54f0f1245            13579 main/binary-arm64/Packages
+ 30898615de884c0c9d6a467b04dbcbb6             3644 main/binary-arm64/Packages.gz
+SHA1:
+ 04714e7bef8e45f8ac2b1a21cb39f309943e472f              267 Release
+ e394f85be606c49767ba256cb296fde370000de7            13579 main/binary-arm64/Packages
+ 4ec5ee1e7792c3fdadd13372385d0deda012fad1             3644 main/binary-arm64/Packages.gz
+SHA256:
+ 3ab871c9d81bba492134080d012ff1c3ba982ac86b626423dba316fac830c615              267 Release
+ bdb8bf6f8008308cc725f38f661bb5a6193827a1de09c4016da58e244a3ff745            13579 main/binary-arm64/Packages
+ c219d1b4fe264333554a96c2b04bb9abb28080ca4bf0c84c7b7642837a8add18             3644 main/binary-arm64/Packages.gz
+SHA512:
+ 16374b0e2d7e9067ee20785cebdf7234175c8e4de513b07f886a662d8a4713d1af48a407613b558dcbdc4da7adfbc23e8bcd179042101b8b6e62e972c3636a26              267 Release
+ 5177a903366eabea44d592a97f11e259654e2d76c96e82e6e18cd83efe2b9ba377ca0d98302832282441205f60eab5a8b7bcd1dc05e76c63cf632eaf6d83a91c            13579 main/binary-arm64/Packages
+ 38354b07c33e1aebac3a105c29d558dc6ebbd7a3c6f3db23e44f9def0e804e25fa15adba2e316251990eb9ce0f0d379d0a0b49934ad84d722593c34ba7c6fe42             3644 main/binary-arm64/Packages.gz
