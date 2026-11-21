@@ -1,0 +1,342 @@
+Package: cutie-browser
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Erik Inkinen <erik.inkinen@gmail.com>
+Installed-Size: 87
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6gui6 (>= 6.1.2), libqt6qml6 (>= 6.6.0), libqt6webenginequick6 (>= 6.6.0), libstdc++6 (>= 5), qml6-module-cutie, qml6-module-qtwebengine, qml6-module-qtwebengine-controlsdelegates, qml6-module-qt-labs-settings
+Filename: pool/main/cutie-browser_1.0.0~git20261120-1_arm64.deb
+Size: 14016
+MD5sum: 50e3424284fe44203e4f49b922cda445
+SHA1: cfccf5393f05c65044c16ba29bdd5f6eb5e27185
+SHA256: c1c56932a3edd7ecd44a286bb5057ab1036b15a84ae966a7e543ba8f4bb9d8a0
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains Cutie's default browser.
+
+Package: cutie-settings
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Erik Inkinen <erik.inkinen@gmail.com>
+Installed-Size: 90
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6gui6 (>= 6.1.2), libqt6qml6 (>= 6.6.0), libstdc++6 (>= 5), qml6-module-cutie, qml6-module-cutievolume, qml6-module-cutienetworking, qml6-module-cutiescreenlock, polkit-kde-agent-1
+Filename: pool/main/cutie-settings_1.0.0~git20261120-1_arm64.deb
+Size: 27342
+MD5sum: d07371521ab6a24fa74887da391f6334
+SHA1: 77d77bf7d9af0c1d41ce43bae49e4c4527d2f82f
+SHA256: 33a7382095715bd6805e512f4be2f3fe0d792a2bfe25604ea88dc7a8f3a13950
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains Cutie Settings app.
+
+Package: libcutiedatetime
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 80
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6dbus6 (>= 6.4.0), libstdc++6 (>= 14)
+Filename: pool/main/libcutiedatetime_1.0.0~git20261120-1_arm64.deb
+Size: 18704
+MD5sum: 7bf349f469d152f7db1c05879075736f
+SHA1: 5c078391b42c323a80a4e09e61fe5c2c1cb2cc6a
+SHA256: 6775c52e8fef0c852c434157963d5efd656bda4891ea7c598c3c407d9140bf03
+Section: libs
+Priority: optional
+Description: Cutie Shell date/time settings library
+ Shared library providing the CutieDateTime C++ backend used by
+ cutie-settings to configure the system clock, timezone, and NTP.
+
+Package: libcutiedatetime-dev
+Source: libcutiedatetime
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 18
+Depends: libcutiedatetime (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiedatetime-dev_1.0.0~git20261120-1_arm64.deb
+Size: 2978
+MD5sum: 230213cd4b5615e788a7b1658a892717
+SHA1: 4d48d1995a316504470986ef38a239b4c3d7420a
+SHA256: 4d12e641b3703ea6c5c15be66e17b29de08f2b6adf2b31483fa8c1a0a26e13c9
+Section: libdevel
+Priority: optional
+Description: Cutie Shell date/time settings library — development files
+ Headers and pkg-config file for building against libcutiedatetime.
+
+Package: libcutiedesktopfileparser
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 143
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libstdc++6 (>= 5)
+Filename: pool/main/libcutiedesktopfileparser_1.0.0~git20261120-1_arm64.deb
+Size: 22902
+MD5sum: f137ca407135c119f9f50ef8cb64ee9f
+SHA1: 8107e23f26bc9698647d363ab786b47392115c61
+SHA256: a1749a16af3e5f71bc533711a932d883589abb2312bddb917effd429ca8e6ad1
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a phone number abstraction library for Cutie.
+
+Package: libcutiedesktopfileparser-dev
+Source: libcutiedesktopfileparser
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 16
+Depends: libcutiedesktopfileparser (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiedesktopfileparser-dev_1.0.0~git20261120-1_arm64.deb
+Size: 2270
+MD5sum: a7108146552b6d5671be081d312b6717
+SHA1: a94acf10bd77f34edc439ff3f1394da8bc91d1ba
+SHA256: 0bf212538ecb4f652959809054d392ca5098059446536c5614f9f464d091446d
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a phone number abstraction library for Cutie. (Development headers)
+
+Package: libcutiescreenlock
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Cutie Shell Developers <admin@cutie-shell.org>
+Installed-Size: 84
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libpam0g (>= 0.99.7.1), libqt6core6t64 (>= 6.10.2), libqt6dbus6 (>= 6.1.2), libstdc++6 (>= 5), libpam-runtime
+Filename: pool/main/libcutiescreenlock_1.0.0~git20261120-1_arm64.deb
+Size: 14140
+MD5sum: 65b266b0542a907f3e96d44acdefaf09
+SHA1: 820ee8d2b1e218dc08bd573c68352ad723386e92
+SHA256: 9cedb11af12aed32b71e970f52ca8f34e8a6b0c6bbedf2069adde95dcc3136a1
+Section: libs
+Priority: optional
+Multi-Arch: same
+Description: Screen-lock authentication engine for Cutie Shell.
+ PAM-backed password auth plus locally hashed PIN/pattern secrets,
+ exposed over D-Bus as org.cutie_shell.CutieScreenLock.
+
+Package: libcutiescreenlock-dev
+Source: libcutiescreenlock
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Cutie Shell Developers <admin@cutie-shell.org>
+Installed-Size: 16
+Depends: libcutiescreenlock (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiescreenlock-dev_1.0.0~git20261120-1_arm64.deb
+Size: 2670
+MD5sum: 3ce45bbb93d0c2993b433b58afe17971
+SHA1: 4bd3f6e1313e1bf7d57c00cc079af8809f610fec
+SHA256: 9843e9f96af723776df837661446388b4e22419fdef7b7081ce94016413a46c4
+Section: libdevel
+Priority: optional
+Multi-Arch: same
+Description: Development files for libcutiescreenlock.
+ Headers needed to link CutieScreenLockAuthority directly (cutie-panel
+ only - everything else should use the Cutie.ScreenLock QML module
+ instead).
+
+Package: libcutiestore
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Erik Inkinen <erik.inkinen@erikinkinen.fi>
+Installed-Size: 79
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libstdc++6 (>= 5)
+Filename: pool/main/libcutiestore_1.0.0~git20261120-1_arm64.deb
+Size: 11076
+MD5sum: 2ebb6fbc170c181618d77849219ddea0
+SHA1: fcb49b55187130092ec5ed70e198c1e75f5104a8
+SHA256: 1c3324b1c3a14bbe5606ea8ddba3f640507a44a53498f4082ee2fd1ee8dd5a32
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a data storage library for Cutie.
+
+Package: libcutiestore-dev
+Source: libcutiestore
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Erik Inkinen <erik.inkinen@erikinkinen.fi>
+Installed-Size: 15
+Depends: libcutiestore (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiestore-dev_1.0.0~git20261120-1_arm64.deb
+Size: 1796
+MD5sum: 411bd478ab07548783d987c41278575f
+SHA1: 31da55a987ec281e5c398d1a64d08964a2647efd
+SHA256: 7eaa857bcf545dc230ae6378a34ca2d65c3a99e560841878f0f16b5a341ddacc
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a data storage library for Cutie. (Development headers)
+
+Package: libcutiesysteminfo
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 7
+Filename: pool/main/libcutiesysteminfo_1.0.0~git20261120-1_arm64.deb
+Size: 978
+MD5sum: 8f2be249a1fd293b455b1b90fc178e75
+SHA1: 0886770c4bdcdae7db4d6a8a92f6e1ba50296daa
+SHA256: 216fda8aea0fdc48dbd80a150b17961736a0ed2a3e62e8b96510001449177e3c
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a system information library for Cutie.
+
+Package: libcutiesysteminfo-dev
+Source: libcutiesysteminfo
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 7
+Depends: libcutiesysteminfo (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiesysteminfo-dev_1.0.0~git20261120-1_arm64.deb
+Size: 1020
+MD5sum: 318f8560bd0c30eb46aa780f32762bf1
+SHA1: da621449634206914549d899fa8711b6a3c26638
+SHA256: c4741a906ae035addd0fbaaace93f17d50bb131f25cfa99e1780ca8d838661f2
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a system information library for Cutie. (Development headers)
+
+Package: libcutiewaydroid
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 143
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libstdc++6 (>= 5)
+Recommends: waydroid
+Filename: pool/main/libcutiewaydroid_1.0.0~git20261120-1_arm64.deb
+Size: 34158
+MD5sum: 98a60892de0a8398725496c8fc807cfc
+SHA1: f078f4c9242048d8b75daf8008f020a7cb09af3d
+SHA256: 1b2e42565229917419925aa372d6b752b72688398fd77a2d9b53acfe3bbdc68b
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a Waydroid lifecycle/app-list helper library for Cutie.
+
+Package: libcutiewaydroid-dev
+Source: libcutiewaydroid
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 20
+Depends: libcutiewaydroid (= 1.0.0~git20261120-1)
+Filename: pool/main/libcutiewaydroid-dev_1.0.0~git20261120-1_arm64.deb
+Size: 3880
+MD5sum: 6686667aebd611d189ff96ac1370b836
+SHA1: b27596f573b85c1ce5a26eba0e99106e640ec4e1
+SHA256: 8fe38f2bd45945e5f2def33689cb5162d03d0414d4a4b0ad3aa829264018517d
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a Waydroid lifecycle/app-list helper library for Cutie. (Development headers)
+
+Package: qml6-module-cutiedatetime
+Source: libcutiedatetime
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 82
+Depends: libcutiedatetime (= 1.0.0~git20261120-1)
+Filename: pool/main/qml6-module-cutiedatetime_1.0.0~git20261120-1_arm64.deb
+Size: 7642
+MD5sum: 32cff38ea72c0bd0d61e0d9877bfb04a
+SHA1: 34ebdcd8418f23640ea3b23ba373c2969e3946a6
+SHA256: cc9589482e749cd33f82c2a7df6b45a9f18120ee40e9bc16edb190de31c92f85
+Section: libs
+Priority: optional
+Description: Cutie Shell date/time QML plugin
+ QML plugin that exposes CutieDateTime as a singleton importable via
+ "import Cutie.Datetime" in QML files.
+
+Package: qml6-module-cutiedesktopfileparser
+Source: libcutiedesktopfileparser
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 82
+Depends: libc6 (>= 2.17), libcutiedesktopfileparser (= 1.0.0~git20261120-1), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6qml6 (>= 6.6.0), libstdc++6 (>= 5)
+Filename: pool/main/qml6-module-cutiedesktopfileparser_1.0.0~git20261120-1_arm64.deb
+Size: 10586
+MD5sum: 92f9828de0e24ad2081007527b0b1f58
+SHA1: 16eac7b30f9077505ffe6b6814ee42c57b4c3232
+SHA256: 319a58fa4340d683a9f6f0b4f92ae21dc4a547da8e0fa2fca56c4a5942d494fd
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a phone number abstraction library for Cutie. (QML module)
+
+Package: qml6-module-cutiescreenlock
+Source: libcutiescreenlock
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Cutie Shell Developers <admin@cutie-shell.org>
+Installed-Size: 145
+Depends: libc6 (>= 2.17), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6dbus6 (>= 6.1.2), libqt6qml6 (>= 6.10.2), libstdc++6 (>= 5), qt6-declarative-private-abi (= 6.10.2), libcutiescreenlock (= 1.0.0~git20261120-1)
+Filename: pool/main/qml6-module-cutiescreenlock_1.0.0~git20261120-1_arm64.deb
+Size: 32388
+MD5sum: b6bc383df1cce0339de60d4264acfac1
+SHA1: 1b01620602dc043075197c78b39f10024b7974f8
+SHA256: a5fd350d1dd1a9b3fb6df55e68fd4894fbd40bc221dc362fb8cad9ac9025cb42
+Section: libs
+Priority: optional
+Multi-Arch: same
+Description: Cutie.ScreenLock QML module.
+ Provides the CutieScreenLock QML type (a D-Bus client for
+ org.cutie_shell.CutieScreenLock) plus the PinPad and PatternLock QML
+ components, for use by cutie-panel's lockscreen and cutie-settings.
+
+Package: qml6-module-cutiestore
+Source: libcutiestore
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Erik Inkinen <erik.inkinen@erikinkinen.fi>
+Installed-Size: 81
+Depends: libc6 (>= 2.17), libcutiestore (= 1.0.0~git20261120-1), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6qml6 (>= 6.6.0), libstdc++6 (>= 5)
+Filename: pool/main/qml6-module-cutiestore_1.0.0~git20261120-1_arm64.deb
+Size: 8168
+MD5sum: 3158fc35bb69fb5e61ffa4ec05e36fd6
+SHA1: a55caa8145d359331e87ae181ec46f1c3f10553d
+SHA256: 5f2c1a982a95a647fe5f6a140f0ea52e2de6799794939cfcb3201e455ea2ea9a
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a data storage library for Cutie. (QML module)
+
+Package: qml6-module-cutiesysteminfo
+Source: libcutiesysteminfo
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 7
+Depends: libcutiesysteminfo (= 1.0.0~git20261120-1)
+Filename: pool/main/qml6-module-cutiesysteminfo_1.0.0~git20261120-1_arm64.deb
+Size: 1030
+MD5sum: 335563e1521f912ae5f0e301dcbd8f35
+SHA1: 9655710bb112ca77a4d9889a3b20a071186be1da
+SHA256: 64c84f18a5c12b406ecb0ddad960b7390757a9517f376649d9f2dc3d26de8c63
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a system information library for Cutie. (QML module)
+
+Package: qml6-module-cutiewaydroid
+Source: libcutiewaydroid
+Version: 1.0.0~git20261120-1
+Architecture: arm64
+Maintainer: Mathew Dennis <mathewdennis693@gmail.com>
+Installed-Size: 81
+Depends: libc6 (>= 2.17), libcutiewaydroid (= 1.0.0~git20261120-1), libgcc-s1 (>= 3.3.1), libqt6core6t64 (>= 6.10.2), libqt6qml6 (>= 6.6.0), libstdc++6 (>= 5)
+Filename: pool/main/qml6-module-cutiewaydroid_1.0.0~git20261120-1_arm64.deb
+Size: 7652
+MD5sum: 1e0697551fccbf159f627f2aa3f1b42c
+SHA1: 585a94025663636a16a153371360a5fdf612a0e3
+SHA256: 5fb0f88bc7b29904bd8afc6f71e87f1b5bb6c27191b8537ffdd9eb78f81022f7
+Section: libs
+Priority: optional
+Multi-Arch: foreign
+Description: This package contains a Waydroid lifecycle/app-list helper library for Cutie. (QML module)
+
